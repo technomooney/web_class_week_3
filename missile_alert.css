@@ -1,0 +1,27 @@
+.missile-link {
+    display: block;
+    font-size: 30px;
+}
+
+table {
+    border: 3px black solid;
+    border-collapse: collapse;
+
+}
+
+td {
+    border: 3px black solid;
+    border-collapse: collapse;
+}
+
+/* i made the real alert an obnoxious red with yellow text... it should be obvious to not click it unless its an actual alert*/
+#real-alert {
+    background-color: darkred;
+    color: yellow;
+}
+/*test is most likely to be used a lot so i made it bigger then the real alert.*/
+#test-only {
+    background-color: lightgreen;
+    color: darkgreen;
+    font-size: 40px;
+}
