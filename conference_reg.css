@@ -1,0 +1,9 @@
+body {
+    background-repeat: no-repeat;
+    background-image: linear-gradient(#804040, #99cc99);
+}
+/* i cant figure out why the background repeats so i set the html to be the inverse of the gradient */
+/* and set the background to no repeat so it at least looks ok... */
+html {
+    background-image: linear-gradient(#99cc99,#804040);
+}

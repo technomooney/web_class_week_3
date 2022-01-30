@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Favorite Code Project</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="favorite_code.css">
+</head>
+<body>
+<div class="jumbotron">
+    <h1>Edited and converted a python program to work and look better</h1>
+    <p>I found a playstation discord presence program to display what im playing on my Playstation on discord.
+    It worked. but it was messy as can be. it also did not have any logging functionality which I wanted.
+    I forked it and did a lot of code restructuring. I will show some of what I did here.</p>
+    <p>the GitHub for the original work is <a href="https://github.com/elsorino/playstationpresence"
+                                              rel="noreferrer noopener" target="_blank">here</a></p>
+    <p>the GitHub for the fork I made is <a href="https://github.com/technomooney/playstationpresence" target="_blank"
+    rel="noreferrer noopener">here</a></p>
+</div>
+
+<div class="mx-5">
+
+    <div>
+        <p>Well one thing I did was get rid of the way this person was looking for the data they needed in the json response
+        that was returned by playstation's api</p>
+    </div>
+    <div>
+        <p>here is an example of what they did. first they would get the data from the Playstation network api and
+        convert the data returned into a flat string like this
+        <pre><code>mainpresence = str(user_online_id.get_presence())</code></pre></p>
+        <p>
+        then they would do split that so they could itterate on it. like this:
+        <pre><code>current = mainpresence.split("'")</code></pre>
+        </p>
+        <p>
+        then they would look for specific data in the split list or use a specific element index to find a specific piece
+        of date the program wanted to display. code: <pre><code>            if (len(current) == 19): #Length of this is 19 if user is not in a game
+                rpc.update(state="Idling", start=start_time, small_image=system, small_text=PSNID, large_image=system, large_text="Homescreen")
+                print("Idling")
+            else:
+                if 'gameStatus' in mainpresence: #Not every game supports gameStatus
+                    gametext = current[39]
+                else:
+                    gametext = current[27]
+                if gameart == "yes":
+                    gameid = current[23]
+                else:
+                    gameid = system
+                gamename = current[27]</code></pre>
+        </p>
+
+        <p>
+            Sure that is quick and dirty and gets the job done. but what happens if the api changes and the size is different?
+            note that this also does not display any custom artwork for the game being played even though the api returns
+            a link to the relevant image for the game being played. I wanted that to work as well so, I did just that.
+        </p>
+    </div>
+    <div>
+        <p>
+            first I got rid of the code that "flattened" the json data. in python a json data structure is identical to a
+            dictionary data type. So I just had to remove the <code>str()</code> function around the code that called to
+            the api. that was easy. now I had to reverse engineer the data in the api because I was not familiar with
+            it at all. luckily that was not too hard. after I did that I converted the logic to use the json data and
+            directly grab for the elements I needed. example:
+        <pre><code>                    if len(mainpresence) == 2: #Length of this is 19 if user is not in a game
+                    rpc.update(state="Idling", start=start_time, small_image=system, small_text=PSNID, large_image=system, large_text="Homescreen")
+                    logging.info(f'Idleing')
+                    print("Idling")
+                else:
+                    if 'gameStatus' in mainpresence['gameTitleInfoList'][0]: #Not every game supports gameStatus
+                        gametext = mainpresence['gameTitleInfoList'][0]['gameStatus']
+                    else:
+                        gametext = mainpresence['gameTitleInfoList'][0]['titleName']
+                    if gameart == "yes":
+                        if 'conceptIconUrl' in mainpresence['gameTitleInfoList'][0]:
+                            gameid = mainpresence['gameTitleInfoList'][0]["conceptIconUrl"]
+                        elif "npTitleIconUrl" in mainpresence['gameTitleInfoList'][0]:
+                            gameid = mainpresence['gameTitleInfoList'][0]["npTitleIconUrl"]
+
+                    else:
+                        gameid = system
+                    gamename = mainpresence['gameTitleInfoList'][0]['titleName']</code></pre>
+        <em>yes</em>... I <em>know</em> some comments are not correct.
+        </p>
+        <p>
+            anyway I also added some logging, and I made the code accept command line arguments for the logging file.
+            I plan on adding functionality that allows it to be run as a service in the background with a heart beat signal system
+            so when it dies it can be restarted automatically by a service manager like systemd or Windows services.
+            but that is a long ways away yet.
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

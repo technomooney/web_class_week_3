@@ -1,0 +1,14 @@
+body {
+    background-color: #3b3b3b;
+    color: #77aacc;
+}
+
+.jumbotron {
+    background-color: #445555;
+    color: #77aacc;
+    text-align: center;
+}
+
+pre {
+    color: #77aacc;
+}
